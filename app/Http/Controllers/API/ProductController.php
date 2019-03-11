@@ -18,7 +18,7 @@ class ProductController extends Controller
     {
         $product = new Product($request->all());
         $product->price = $request->get('price');
-        $product->discount = $request->get('discount');
+        $product->discount = $request->get('discount') ?? $product->discount;
         $product->save();
 
         return $product;
