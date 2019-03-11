@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: genesis_task_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: homestead
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+
+  php:
+    build:
+      context: ./docker
+      dockerfile: php.dockerfile
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=genesis_task_mysql"
+    image: php:7.2-fpm
+    container_name: genesis_task_php
+    volumes:
+      - ./:/var/www/GenesisApiTask
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:1.13
+    container_name: genesis_task_nginx
+    volumes:
+      - ./:/var/www/GenesisApiTask
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    depends_on:
+      - php
